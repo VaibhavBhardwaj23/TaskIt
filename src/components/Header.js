@@ -3,6 +3,9 @@ import Logo from "../assets/icon.png";
 import { signInWithPopup, signOut } from "firebase/auth";
 import { auth, provider } from "../firebase/config";
 const Header = () => {
+  const [userInfo, setUserInfo] = useState(
+    JSON.parse(localStorage.getItem("userInfo"))
+  );
   const [theme, setTheme] = useState(
     JSON.parse(localStorage.getItem("taskItTheme")) || "dark"
   );
@@ -13,6 +16,7 @@ const Header = () => {
     signInWithPopup(auth, provider).then((result) => {
       localStorage.setItem("todoAuth", JSON.stringify(true));
       localStorage.setItem("userInfo", JSON.stringify(result));
+      setUserInfo(result);
       setTodoAuth(true);
       console.log(result);
       window.location.reload();
@@ -41,7 +45,7 @@ const Header = () => {
       {todoAuth ? (
         <div onClick={handleLogOut}>
           <span className="login">LogOut</span>
-          <span>Guest</span>
+          <span>{userInfo.user.displayName}</span>
         </div>
       ) : (
         <div onClick={handleLogin} className="login">
