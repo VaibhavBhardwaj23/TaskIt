@@ -1,31 +1,32 @@
-import React from "react";
+import { signInWithPopup } from "firebase/auth";
+import React, { useState } from "react";
+import { auth, db, provider } from "../firebase/config";
+import { addDoc, collection } from "firebase/firestore";
 
-const AddTask = ({ taskList, setTaskList, task, setTask }) => {
+const AddTask = ({ toggle, setToggle }) => {
+  const [todoAuth, setTodoAuth] = useState(
+    JSON.parse(localStorage.getItem("todoAuth")) || false
+  );
+  // const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (task.id) {
-      const date = new Date();
-      const updatedTaskList = taskList.map((todo) =>
-        todo.id === task.id
-          ? {
-              id: task.id,
-              name: task.name,
-              time: `${date.toLocaleTimeString()} ${date.toLocaleDateString()}`,
-            }
-          : { id: todo.id, name: todo.name, time: todo.time }
-      );
-      setTaskList(updatedTaskList);
-      setTask("");
-    } else {
+    if (todoAuth) {
       const date = new Date();
       const newTask = {
         id: date.getTime(),
         name: e.target.task.value,
         time: `${date.toLocaleTimeString()} ${date.toLocaleDateString()}`,
       };
-      setTaskList([...taskList, newTask]);
+      addDoc(collection(db, auth.currentUser.uid), newTask);
+      setToggle(!toggle);
       e.target.task.value = "";
-      setTask({});
+    } else {
+      signInWithPopup(auth, provider).then((result) => {
+        localStorage.setItem("todoAuth", JSON.stringify(true));
+        localStorage.setItem("userInfo", JSON.stringify(result));
+        setTodoAuth(true);
+        window.location.reload();
+      });
     }
   };
   return (
@@ -34,14 +35,10 @@ const AddTask = ({ taskList, setTaskList, task, setTask }) => {
         <input
           type="text"
           name="task"
-          value={task.name || ""}
-          onChange={(e) => {
-            setTask({ ...task, name: e.target.value });
-          }}
           autoComplete="off"
           placeholder="Enter Task"
         />
-        <button type="submit">{task.id ? "Update" : "Add"}</button>
+        <button type="submit">Add</button>
       </form>
     </section>
   );

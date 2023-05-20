@@ -189,6 +189,14 @@ header .themeSelector .activeTheme {
   color: #d82148;
   cursor: pointer;
 }
+.login {
+  background-color: #1363df;
+  padding: 0.5em;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  margin: 0 10px;
+}
 
 @media only screen and (max-width: 800px) {
   .showTask li {

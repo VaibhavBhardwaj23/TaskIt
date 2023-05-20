@@ -1,9 +1,32 @@
 import React, { useEffect, useState } from "react";
 import Logo from "../assets/icon.png";
+import { signInWithPopup, signOut } from "firebase/auth";
+import { auth, provider } from "../firebase/config";
 const Header = () => {
   const [theme, setTheme] = useState(
     JSON.parse(localStorage.getItem("taskItTheme")) || "dark"
   );
+  const [todoAuth, setTodoAuth] = useState(
+    JSON.parse(localStorage.getItem("todoAuth")) || false
+  );
+  const handleLogin = () => {
+    signInWithPopup(auth, provider).then((result) => {
+      localStorage.setItem("todoAuth", JSON.stringify(true));
+      localStorage.setItem("userInfo", JSON.stringify(result));
+      setTodoAuth(true);
+      console.log(result);
+      window.location.reload();
+    });
+  };
+  const handleLogOut = () => {
+    signOut(auth);
+    localStorage.setItem("todoAuth", JSON.stringify(false));
+    localStorage.setItem("userInfo", JSON.stringify(null));
+
+    setTodoAuth(false);
+    window.location.reload();
+  };
+
   useEffect(() => {
     localStorage.setItem("taskItTheme", JSON.stringify(theme));
     document.documentElement.removeAttribute("class");
@@ -15,6 +38,16 @@ const Header = () => {
         <img src={Logo} alt="logo" />
         Task-It
       </div>
+      {todoAuth ? (
+        <div onClick={handleLogOut}>
+          <span className="login">LogOut</span>
+          <span>Guest</span>
+        </div>
+      ) : (
+        <div onClick={handleLogin} className="login">
+          Login
+        </div>
+      )}
       <div className="themeSelector">
         <span
           onClick={() => setTheme("light")}
