@@ -16,7 +16,6 @@ const Header = () => {
     signInWithPopup(auth, provider).then((result) => {
       localStorage.setItem("todoAuth", JSON.stringify(true));
       localStorage.setItem("userInfo", JSON.stringify(result));
-      setUserInfo(result);
       setTodoAuth(true);
       console.log(result);
       window.location.reload();
